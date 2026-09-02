@@ -51,4 +51,8 @@ export class UserService {
             {new: true},
         );
     }
+
+    async getAllUser() {
+        return this.userModel.find().exec();
+    }
 }
