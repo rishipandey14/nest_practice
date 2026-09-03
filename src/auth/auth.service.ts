@@ -145,7 +145,7 @@ export class AuthService {
     }
 
     async LoginUser(loginUserDto: LoginUserDTO) {
-        console.log(loginUserDto);
+        // console.log(loginUserDto);
         const { email, password } = loginUserDto;
         
         const hashed_password = await bcrypt.hash(password, 10);
