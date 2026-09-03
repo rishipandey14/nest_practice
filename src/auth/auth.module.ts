@@ -7,6 +7,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailModule } from 'src/mail/mail.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PasswordResetToken, PasswordResetTokenSchema } from './Schemas/PasswordResetToken.schema';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './guards/auth.guard';
 
 @Module({
   imports: [
@@ -31,6 +33,12 @@ import { PasswordResetToken, PasswordResetTokenSchema } from './Schemas/Password
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [
+    AuthService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    }
+  ],
 })
 export class AuthModule {}
