@@ -1,5 +1,5 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { RegisterUserDTO } from './DTO/RegisterUser.dto';
+import { RegisterUserDTO } from '../auth/DTO/RegisterUser.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './Schemas/user.schems';
 import { Model, Types } from 'mongoose';

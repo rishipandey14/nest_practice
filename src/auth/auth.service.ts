@@ -1,15 +1,16 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from "bcrypt";
 import { JwtService } from '@nestjs/jwt';
 import { MailService } from 'src/mail/mail.service';
 import { ForgotPasswordDTO } from './DTO/ForgotPassword.dto';
-import { RegisterUserDTO } from 'src/user/DTO/RegisterUser.dto';
+import { RegisterUserDTO } from 'src/auth/DTO/RegisterUser.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { PasswordResetToken } from './Schemas/PasswordResetToken.schema';
 import { Model } from 'mongoose';
 import { createHash, randomBytes } from 'crypto';
 import { ResetPasswordDTO } from './DTO/ResetPasswpord.dto';
+import { LoginUserDTO } from './DTO/LoginUser.dto';
 
 @Injectable()
 export class AuthService {
@@ -141,5 +142,31 @@ export class AuthService {
             message: "Password reset successfully"
         }
 
+    }
+
+    async LoginUser(loginUserDto: LoginUserDTO) {
+        console.log(loginUserDto);
+        const { email, password } = loginUserDto;
+        
+        const hashed_password = await bcrypt.hash(password, 10);
+        
+        const user = await this.userService.findByEmail(email);
+        if(!user) throw new UnauthorizedException('Invalid email or password');
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if(!isPasswordValid) throw new UnauthorizedException('Invalid email or password');
+        
+        const payload = {
+            sub: user._id,
+            email: user.email,
+            role: user.role
+        }
+        const token = await this.jwtService.signAsync(payload);
+
+        return {
+            message: 'User logged in successfully',
+            access_token: token,
+        };
     }
 }
