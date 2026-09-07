@@ -2,8 +2,7 @@ import { Controller, Get, UseGuards, UseInterceptors } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { SkipThrottle } from "@nestjs/throttler";
 import { CacheInterceptor, CacheKey, CacheTTL } from "@nestjs/cache-manager";
-import { SkipAuth } from "src/auth/Decorators/skipAuth.decorator";
-import { Roles } from "src/auth/Decorators/roles.decorator";
+import { Permissions } from "src/permission/decorator/permission.decorator";
 
 
 @Controller()
@@ -13,9 +12,8 @@ export class UserController {
     @SkipThrottle({'short': true, 'medium': true})
     @UseInterceptors(CacheInterceptor)
     @CacheKey('users')
-    // @SkipAuth()
+    @Permissions("user:view")
     // @CacheTTL(30 * 1000)
-    @Roles('admin')
     @Get('/users')
     async getUsers() {
         return this.userService.getAllUser();

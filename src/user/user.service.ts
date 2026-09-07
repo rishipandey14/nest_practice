@@ -11,13 +11,13 @@ export class UserService {
         private userModel: Model<User>,
     ) {}
 
-    async createUser(registerUserDto: RegisterUserDTO, hashed_password: string) {
+    async createUser(registerUserDto: RegisterUserDTO, hashed_password: string, role_id: number) {
         try {
             const user = await this.userModel.create({
                 name: registerUserDto.name,
                 age: registerUserDto.age,
                 email: registerUserDto.email,
-                role: registerUserDto.role,
+                role_id: role_id,
                 password: hashed_password,
             });
             return user;

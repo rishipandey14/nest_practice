@@ -9,7 +9,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { PasswordResetToken, PasswordResetTokenSchema } from './Schemas/PasswordResetToken.schema';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
-import { RolesGuard } from './guards/roles.guard';
 
 @Module({
   imports: [
@@ -40,10 +39,6 @@ import { RolesGuard } from './guards/roles.guard';
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    }
   ],
 })
 export class AuthModule {}

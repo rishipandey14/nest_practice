@@ -20,6 +20,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
+import { PermissionModule } from './permission/permission.module';
+import { RolesModule } from './roles/roles.module';
 import KeyvRedis from '@keyv/redis';
 
 @Module({
@@ -77,8 +79,6 @@ import KeyvRedis from '@keyv/redis';
         return `${trackerString}:${request.method}:${request.route?.path}`;
       },
     }),
-    AuthModule,
-    UserModule,
     BullModule.forRoot({
       connection: { host: 'localhost', port: 6379 },
       defaultJobOptions: {
@@ -89,8 +89,6 @@ import KeyvRedis from '@keyv/redis';
       },
     }),
     BullModule.registerQueue({ name: 'video' }),
-    MailModule,
-
     // make cache available through out the application
     CacheModule.registerAsync({
       isGlobal: true,
@@ -102,7 +100,12 @@ import KeyvRedis from '@keyv/redis';
           stores: new KeyvRedis(configService.get<string>('REDIS_URL'))
         }
       }
-    })
+    }),
+    MailModule,
+    AuthModule,
+    UserModule,
+    PermissionModule,
+    RolesModule
   ],
   controllers: [AppController, VideoController],
   providers: [

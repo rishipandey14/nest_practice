@@ -15,8 +15,11 @@ export class User {
   @Prop({required: true, unique: true})
   email!: string;
 
-  @Prop({default: Role.Student})
-  role!: string;
+  @Prop({
+    required: true,
+    type: Number,
+  })
+  role_id!: number;
 
   @Prop({required: true})
   password !: string;

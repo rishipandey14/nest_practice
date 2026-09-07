@@ -14,7 +14,4 @@ export class RegisterUserDTO {
     @IsString()
     @MinLength(8)
     password!: string;
-
-    @IsString()
-    role!: string;
 };

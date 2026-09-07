@@ -11,6 +11,7 @@ import { Model } from 'mongoose';
 import { createHash, randomBytes } from 'crypto';
 import { ResetPasswordDTO } from './DTO/ResetPasswpord.dto';
 import { LoginUserDTO } from './DTO/LoginUser.dto';
+import { SYSTEM_ROLE_IDS } from 'src/roles/constants/roles.constant';
 
 @Injectable()
 export class AuthService {
@@ -35,7 +36,11 @@ export class AuthService {
          * generate JWT Token
          * return token in response
          */
-        const user = await this.userService.createUser(registerUserDto, hashedPassword);
+        const user = await this.userService.createUser(
+            registerUserDto, 
+            hashedPassword,
+            SYSTEM_ROLE_IDS.USER,
+        );
 
         await this.mailService.sendWelcomeEmail(
             user.email,
@@ -45,7 +50,7 @@ export class AuthService {
         const payload = {
             sub: user._id,
             email: user.email,
-            role: user.role
+            role_id: user.role_id
         }
         const token = await this.jwtService.signAsync(payload);
 
@@ -141,14 +146,11 @@ export class AuthService {
         return {
             message: "Password reset successfully"
         }
-
     }
 
     async LoginUser(loginUserDto: LoginUserDTO) {
         // console.log(loginUserDto);
         const { email, password } = loginUserDto;
-        
-        const hashed_password = await bcrypt.hash(password, 10);
         
         const user = await this.userService.findByEmail(email);
         if(!user) throw new UnauthorizedException('Invalid email or password');
@@ -160,8 +162,9 @@ export class AuthService {
         const payload = {
             sub: user._id,
             email: user.email,
-            role: user.role
+            role_id: user.role_id
         }
+        console.log("User logged in details; ", user);
         const token = await this.jwtService.signAsync(payload);
 
         return {
