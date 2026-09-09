@@ -20,6 +20,12 @@ export class AuthController {
     }
 
     @SkipAuth()
+    @Post('register/seller') 
+    RegisterSeller(@Body() registerUserDto: RegisterUserDTO) {
+        return this.authService.RegisterSeller(registerUserDto);
+    }
+
+    @SkipAuth()
     @Post('login')
     Login(@Body() loginUserDto: LoginUserDTO) {
         return this.authService.LoginUser(loginUserDto);

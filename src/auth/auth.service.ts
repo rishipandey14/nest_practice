@@ -60,6 +60,43 @@ export class AuthService {
         };
     }
 
+
+    async RegisterSeller(registerUserDto: RegisterUserDTO) {
+
+        const saltRound = 10;
+        const hashedPassword = await bcrypt.hash(registerUserDto.password, saltRound);
+        // Logic for User Registeration
+        /**
+         * Check if email already exist
+         * hash the password
+         * store the user in DataBase
+         * generate JWT Token
+         * return token in response
+         */
+        const user = await this.userService.createUser(
+            registerUserDto, 
+            hashedPassword,
+            SYSTEM_ROLE_IDS.SELLER,
+        );
+
+        await this.mailService.sendWelcomeEmail(
+            user.email,
+            user.name
+        )
+
+        const payload = {
+            sub: user._id,
+            email: user.email,
+            role_id: user.role_id
+        }
+        const token = await this.jwtService.signAsync(payload);
+
+        return {
+            message: 'Seller registered successfully',
+            access_token: token,
+        };
+    }
+
     async ForgotPassword(forgotPasswordDto: ForgotPasswordDTO) {
         /**
          * find user
