@@ -22,7 +22,10 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-yet';
 import { PermissionModule } from './permission/permission.module';
 import { RolesModule } from './roles/roles.module';
+import { ProductsModule } from './ecomm/products/products.module';
 import KeyvRedis from '@keyv/redis';
+import {TypeOrmModule} from '@nestjs/typeorm'
+import { CategoryModule } from './ecomm/category/category.module';
 
 @Module({
   imports: [
@@ -35,6 +38,21 @@ import KeyvRedis from '@keyv/redis';
       useFactory: (configService: ConfigService) => ({
         uri: configService.get<string>('MONGO_URI'),
         autoIndex: true,
+      }),
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_NAME'),
+        autoLoadEntities: true,
+        synchronize: true, // Don't use true in production
       }),
     }),
     ThrottlerModule.forRoot({
@@ -105,7 +123,9 @@ import KeyvRedis from '@keyv/redis';
     AuthModule,
     UserModule,
     PermissionModule,
-    RolesModule
+    RolesModule,
+    ProductsModule,
+    CategoryModule
   ],
   controllers: [AppController, VideoController],
   providers: [
