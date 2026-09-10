@@ -17,6 +17,17 @@ interface PasswordChangeConfirmationEmailJob {
 }
 
 
+interface OrderConfirmationEmailJob {
+    email: string;
+    orderId: string;
+    items: {
+        productId: string;
+        quantity: number;
+    }[];
+    total: number;
+}
+
+
 @Processor('email', {concurrency: 2})
 export class EmailProcessor extends WorkerHost {
     constructor(private readonly emailService: EmailService) {
@@ -55,6 +66,20 @@ export class EmailProcessor extends WorkerHost {
                     data.email,
                 )
                 console.log(`Password changed confirmation email sent to: ${data.email}`)
+                break;
+            }
+
+            case 'OrderConfirmation': {
+                const data =
+                    job.data as OrderConfirmationEmailJob;
+
+                await this.emailService
+                    .sendOrderConfirmationEmail(data);
+
+                console.log(
+                    `Order confirmation email sent to ${data.email}`,
+                );
+
                 break;
             }
 

@@ -6,6 +6,7 @@ export interface OrderCreatedItem {
 export class OrderCreatedEvent {
     constructor(
         public readonly orderId: string,
+        public readonly email: string,
         public readonly items: OrderCreatedItem[]
     ) {}
 }

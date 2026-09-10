@@ -37,4 +37,25 @@ export class EmailService {
       },
     });
   }
+
+  async sendOrderConfirmationEmail(data: {
+      email: string;
+      orderId: string;
+      items: {
+          productId: string;
+          quantity: number;
+      }[];
+  }) {
+
+      return this.mailerService.sendMail({
+          to: data.email,
+          subject: `Order Confirmation #${data.orderId}`,
+          template: 'orderConfirmation',
+          context: {
+              orderId: data.orderId,
+              email: data.email,
+              items: data.items,
+          },
+      });
+  }
 }

@@ -8,6 +8,6 @@ export class OrdersController {
 
   @Post()
   create( @Req() req: any, @Body() createOrderDto: CreateOrderDto ) {
-    return this.ordersService.create(req.user.sub, createOrderDto);
+    return this.ordersService.create(req.user.sub, req.user.email, createOrderDto);
   }
 }

@@ -1,0 +1,368 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Order Confirmation</title> </head> <body style=" margin: 0; padding: 0; background-color: #f3f4f6; font-family: Arial, Helvetica, sans-serif; color: #111827; "> <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f3f4f6; padding: 40px 15px;">
+<tr>
+    <td align="center">
+
+        <!-- Main Container -->
+        <table width="600" cellpadding="0" cellspacing="0" border="0"
+            style="
+                max-width: 600px;
+                width: 100%;
+                background-color: #ffffff;
+                border-radius: 16px;
+                overflow: hidden;
+            ">
+
+            <!-- Header -->
+            <tr>
+                <td align="center"
+                    style="
+                        padding: 40px 30px;
+                        background-color: #111827;
+                    ">
+
+                    <div style="
+                        width: 60px;
+                        height: 60px;
+                        line-height: 60px;
+                        margin: 0 auto 18px;
+                        background-color: #22c55e;
+                        border-radius: 50%;
+                        color: #ffffff;
+                        font-size: 30px;
+                        font-weight: bold;
+                    ">
+                        ✓
+                    </div>
+
+                    <h1 style="
+                        margin: 0;
+                        color: #ffffff;
+                        font-size: 28px;
+                    ">
+                        Order Confirmed!
+                    </h1>
+
+                    <p style="
+                        margin: 10px 0 0;
+                        color: #d1d5db;
+                        font-size: 15px;
+                    ">
+                        Thank you for your purchase.
+                    </p>
+
+                </td>
+            </tr>
+
+
+            <!-- Introduction -->
+            <tr>
+                <td style="padding: 35px 35px 20px;">
+
+                    <p style="
+                        margin: 0;
+                        font-size: 16px;
+                        line-height: 1.6;
+                        color: #374151;
+                    ">
+                        Your order has been successfully placed.
+                        We are now preparing your items.
+                    </p>
+
+                </td>
+            </tr>
+
+
+            <!-- Order Information -->
+            <tr>
+                <td style="padding: 0 35px 30px;">
+
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                        style="
+                            background-color: #f9fafb;
+                            border: 1px solid #e5e7eb;
+                            border-radius: 10px;
+                        ">
+
+                        <tr>
+
+                            <!-- Order ID -->
+                            <td width="50%"
+                                style="
+                                    padding: 18px;
+                                    border-right: 1px solid #e5e7eb;
+                                ">
+
+                                <p style="
+                                    margin: 0 0 6px;
+                                    color: #6b7280;
+                                    font-size: 11px;
+                                    text-transform: uppercase;
+                                    letter-spacing: 0.5px;
+                                ">
+                                    Order ID
+                                </p>
+
+                                <p style="
+                                    margin: 0;
+                                    color: #111827;
+                                    font-size: 13px;
+                                    font-weight: bold;
+                                    word-break: break-all;
+                                ">
+                                    #{{orderId}}
+                                </p>
+
+                            </td>
+
+
+                            <!-- Email -->
+                            <td width="50%" style="padding: 18px;">
+
+                                <p style="
+                                    margin: 0 0 6px;
+                                    color: #6b7280;
+                                    font-size: 11px;
+                                    text-transform: uppercase;
+                                    letter-spacing: 0.5px;
+                                ">
+                                    Email
+                                </p>
+
+                                <p style="
+                                    margin: 0;
+                                    color: #111827;
+                                    font-size: 13px;
+                                    font-weight: bold;
+                                    word-break: break-word;
+                                ">
+                                    {{email}}
+                                </p>
+
+                            </td>
+
+                        </tr>
+
+                    </table>
+
+                </td>
+            </tr>
+
+
+            <!-- Items Title -->
+            <tr>
+                <td style="padding: 0 35px 15px;">
+
+                    <h2 style="
+                        margin: 0;
+                        font-size: 20px;
+                        color: #111827;
+                    ">
+                        Order Items
+                    </h2>
+
+                </td>
+            </tr>
+
+
+            <!-- Items Table -->
+            <tr>
+                <td style="padding: 0 35px;">
+
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                        style="border-collapse: collapse;">
+
+                        <!-- Header -->
+                        <tr style="background-color: #f9fafb;">
+
+                            <th align="left"
+                                style="
+                                    padding: 13px;
+                                    color: #6b7280;
+                                    font-size: 12px;
+                                    text-transform: uppercase;
+                                ">
+                                Product
+                            </th>
+
+                            <th align="center"
+                                style="
+                                    padding: 13px;
+                                    color: #6b7280;
+                                    font-size: 12px;
+                                    text-transform: uppercase;
+                                ">
+                                Quantity
+                            </th>
+
+                        </tr>
+
+
+                        <!-- Items -->
+                        {{#each items}}
+
+                        <tr>
+
+                            <td style="
+                                padding: 18px 13px;
+                                border-bottom: 1px solid #e5e7eb;
+                            ">
+
+                                <p style="
+                                    margin: 0;
+                                    color: #111827;
+                                    font-size: 14px;
+                                    font-weight: bold;
+                                ">
+                                    Product
+                                </p>
+
+                                <p style="
+                                    margin: 5px 0 0;
+                                    color: #9ca3af;
+                                    font-size: 11px;
+                                    word-break: break-all;
+                                ">
+                                    ID: {{productId}}
+                                </p>
+
+                            </td>
+
+
+                            <td align="center"
+                                style="
+                                    padding: 18px 13px;
+                                    border-bottom: 1px solid #e5e7eb;
+                                    color: #374151;
+                                    font-size: 14px;
+                                    font-weight: bold;
+                                ">
+                                {{quantity}}
+                            </td>
+
+                        </tr>
+
+                        {{/each}}
+
+                    </table>
+
+                </td>
+            </tr>
+
+
+            <!-- Total Items -->
+            <tr>
+                <td style="padding: 25px 35px 30px;">
+
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+
+                        <tr>
+
+                            <td style="
+                                padding-top: 15px;
+                                border-top: 2px solid #111827;
+                                color: #111827;
+                                font-size: 16px;
+                                font-weight: bold;
+                            ">
+                                Total Items
+                            </td>
+
+                            <td align="right"
+                                style="
+                                    padding-top: 15px;
+                                    border-top: 2px solid #111827;
+                                    color: #22c55e;
+                                    font-size: 18px;
+                                    font-weight: bold;
+                                ">
+                                {{items.length}}
+                            </td>
+
+                        </tr>
+
+                    </table>
+
+                </td>
+            </tr>
+
+
+            <!-- Status Box -->
+            <tr>
+                <td style="padding: 0 35px 35px;">
+
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                        style="
+                            background-color: #ecfdf5;
+                            border: 1px solid #bbf7d0;
+                            border-radius: 10px;
+                        ">
+
+                        <tr>
+
+                            <td style="padding: 20px;">
+
+                                <p style="
+                                    margin: 0 0 7px;
+                                    color: #166534;
+                                    font-size: 14px;
+                                    font-weight: bold;
+                                ">
+                                    ✓ Order Successfully Placed
+                                </p>
+
+                                <p style="
+                                    margin: 0;
+                                    color: #15803d;
+                                    font-size: 13px;
+                                    line-height: 1.6;
+                                ">
+                                    We are preparing your order.
+                                    You will receive another email when
+                                    your order status changes.
+                                </p>
+
+                            </td>
+
+                        </tr>
+
+                    </table>
+
+                </td>
+            </tr>
+
+
+            <!-- Footer -->
+            <tr>
+                <td align="center"
+                    style="
+                        padding: 28px 35px;
+                        background-color: #f9fafb;
+                        border-top: 1px solid #e5e7eb;
+                    ">
+
+                    <p style="
+                        margin: 0;
+                        color: #374151;
+                        font-size: 14px;
+                        font-weight: bold;
+                    ">
+                        Thank you for shopping with us ❤️
+                    </p>
+
+                    <p style="
+                        margin: 8px 0 0;
+                        color: #9ca3af;
+                        font-size: 12px;
+                    ">
+                        This is an automated email.
+                    </p>
+
+                </td>
+            </tr>
+
+        </table>
+
+    </td>
+</tr>
+
+</table> </body> </html>

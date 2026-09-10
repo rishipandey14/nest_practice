@@ -18,7 +18,7 @@ export class OrdersService {
         private readonly eventEmitter: EventEmitter2
     ) {}
 
-    async create (userId: string, createOrderDto: CreateOrderDto) {
+    async create (userId: string, email: string, createOrderDto: CreateOrderDto) {
         // get all the productIds from order items
         const productIds = createOrderDto.items.map((item) => item.productId)
 
@@ -67,6 +67,7 @@ export class OrdersService {
             'order.created',
             new OrderCreatedEvent(
                 savedOrder.id,
+                email,
                 orderItems.map((item) => ({
                     productId: item.productId,
                     quantity: item.quantity

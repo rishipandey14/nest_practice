@@ -2,6 +2,7 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Queue } from 'bullmq';
+import { OrderCreatedItem } from 'src/ecomm/orders/events/orderCreated.event';
 
 @Injectable()
 export class MailService {
@@ -35,5 +36,13 @@ export class MailService {
             'PasswordChangedConfirmation',
             {email},
         );
+    }
+
+    async sendOrderConfirmationMail(data: {
+        email: string;
+        orderId: string;
+        items: OrderCreatedItem[];
+    }) {
+        await this.emailQueue.add('OrderConfirmation', data);
     }
 }
