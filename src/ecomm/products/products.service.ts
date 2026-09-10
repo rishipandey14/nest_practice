@@ -5,12 +5,15 @@ import { Repository } from 'typeorm';
 import { CreateProductDto } from './DTO/createProduct.dto';
 import { UpdateProductDto } from './DTO/updateProduct.dto';
 import { Category } from '../category/entity/category.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { ProductCreatedEvent } from './events/productCreated.events';
 
 @Injectable()
 export class ProductsService {
     constructor(
         @InjectRepository(Product) private readonly productRepository : Repository<Product> ,
         @InjectRepository(Category) private readonly categoryRepository : Repository<Category> ,
+        private readonly eventEmitter: EventEmitter2,
     ) {}
 
     async create(createProductDto: CreateProductDto) {
@@ -26,12 +29,16 @@ export class ProductsService {
             name: createProductDto.name,
             description: createProductDto.description,
             price: createProductDto.price,
-            stock: createProductDto.stock,
             isActive: createProductDto.isActive ?? true,
             category,
         });
 
-        this.productRepository.save(product);
+        const savedProduct = await this.productRepository.save(product);
+
+        this.eventEmitter.emit(
+            'product.created',
+            new ProductCreatedEvent(savedProduct.id, createProductDto.stock)
+        )
 
         return {
             message: "Product created successfully."

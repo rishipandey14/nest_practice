@@ -26,9 +26,6 @@ export class Product {
   })
   price !: number;
 
-  @Column({ default: 0 })
-  stock !: number;
-
   @Column({ default: true })
   isActive !: boolean;
 

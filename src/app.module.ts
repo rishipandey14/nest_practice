@@ -26,12 +26,15 @@ import { ProductsModule } from './ecomm/products/products.module';
 import KeyvRedis from '@keyv/redis';
 import {TypeOrmModule} from '@nestjs/typeorm'
 import { CategoryModule } from './ecomm/category/category.module';
+import { InventoryModule } from './ecomm/inventory/inventory.module';
+import { EventEmitterModule} from '@nestjs/event-emitter'
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    EventEmitterModule.forRoot(),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -125,7 +128,8 @@ import { CategoryModule } from './ecomm/category/category.module';
     PermissionModule,
     RolesModule,
     ProductsModule,
-    CategoryModule
+    CategoryModule,
+    InventoryModule
   ],
   controllers: [AppController, VideoController],
   providers: [
