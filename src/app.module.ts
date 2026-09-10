@@ -28,6 +28,7 @@ import {TypeOrmModule} from '@nestjs/typeorm'
 import { CategoryModule } from './ecomm/category/category.module';
 import { InventoryModule } from './ecomm/inventory/inventory.module';
 import { EventEmitterModule} from '@nestjs/event-emitter'
+import { OrdersModule } from './ecomm/orders/orders.module';
 
 @Module({
   imports: [
@@ -129,7 +130,8 @@ import { EventEmitterModule} from '@nestjs/event-emitter'
     RolesModule,
     ProductsModule,
     CategoryModule,
-    InventoryModule
+    InventoryModule,
+    OrdersModule
   ],
   controllers: [AppController, VideoController],
   providers: [
