@@ -6,6 +6,8 @@ import { OrderItem } from './entity/orderItem.entity';
 import { Product } from '../products/entity/products.entity';
 import { CreateOrderDto } from './DTO/createOrder.dto';
 import { OrderStatus } from './enums/orderStatus.enum';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { OrderCreatedEvent } from './events/orderCreated.event';
 
 @Injectable()
 export class OrdersService {
@@ -13,6 +15,7 @@ export class OrdersService {
         @InjectRepository(Order) private readonly orderRepository : Repository<Order>,
         @InjectRepository(OrderItem) private readonly orderItemRepository : Repository<OrderItem>,
         @InjectRepository(Product) private readonly productRepository : Repository<Product>,
+        private readonly eventEmitter: EventEmitter2
     ) {}
 
     async create (userId: string, createOrderDto: CreateOrderDto) {
@@ -58,7 +61,18 @@ export class OrdersService {
             items: orderItems as OrderItem[]
         });
 
-        this.orderRepository.save(order);
+        const savedOrder = await this.orderRepository.save(order);
+
+        this.eventEmitter.emit(
+            'order.created',
+            new OrderCreatedEvent(
+                savedOrder.id,
+                orderItems.map((item) => ({
+                    productId: item.productId,
+                    quantity: item.quantity
+                })),
+            )
+        );
 
         return {
             message: "Order created successfully.",

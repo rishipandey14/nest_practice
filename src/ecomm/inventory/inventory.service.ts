@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Inventory } from './entity/inventory.entity';
 import { Repository } from 'typeorm';
@@ -6,6 +6,7 @@ import { Product } from '../products/entity/products.entity';
 import { UpdateInventoryDto } from './DTO/updateInventory.dto';
 import { OnEvent } from '@nestjs/event-emitter';
 import { ProductCreatedEvent } from '../products/events/productCreated.events';
+import { OrderCreatedEvent } from '../orders/events/orderCreated.event';
 
 @Injectable()
 export class InventoryService {
@@ -55,6 +56,31 @@ export class InventoryService {
 
         inventory.quantity = dto.quantity;
 
+        return this.inventoryRepository.save(inventory);
+    }
+
+    @OnEvent('order.created')
+    async handleOrderCreated (event : OrderCreatedEvent) {
+        for(const item of event.items) {
+            await this.reserveStock(
+                event.orderId,
+                item.productId,
+                item.quantity
+            )
+        }
+    };
+
+    async reserveStock( orderId: string, productId: string, quantity: number) : Promise<Inventory> {
+        const inventory = await this.inventoryRepository.findOne({
+            where: {productId}
+        });
+
+        if(!inventory) throw new NotFoundException(`Inventory not found for product: ${productId}`);
+
+        const availableQuantity = inventory.quantity - inventory.reservedQuantity;
+        if(availableQuantity < quantity) throw new BadRequestException(`Insufficient stock for product ${productId}`);
+
+        inventory.reservedQuantity += quantity;
         return this.inventoryRepository.save(inventory);
     }
 }
