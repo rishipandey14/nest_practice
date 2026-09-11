@@ -8,11 +8,13 @@ import { Product } from '../products/entity/products.entity';
 import { MailService } from 'src/mail/mail.service';
 import { MailModule } from 'src/mail/mail.module';
 import { OrderCreatedEmailListener } from './listeners/orderCreatedMail.listener';
+import { InventoryModule } from '../inventory/inventory.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Order, OrderItem, Product]),
     MailModule,
+    InventoryModule
   ],
   controllers: [OrdersController],
   providers: [

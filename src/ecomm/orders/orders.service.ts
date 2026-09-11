@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entity/order.entity';
 import { Repository } from 'typeorm';
@@ -8,6 +8,7 @@ import { CreateOrderDto } from './DTO/createOrder.dto';
 import { OrderStatus } from './enums/orderStatus.enum';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { OrderCreatedEvent } from './events/orderCreated.event';
+import { InventoryService } from '../inventory/inventory.service';
 
 @Injectable()
 export class OrdersService {
@@ -15,69 +16,113 @@ export class OrdersService {
         @InjectRepository(Order) private readonly orderRepository : Repository<Order>,
         @InjectRepository(OrderItem) private readonly orderItemRepository : Repository<OrderItem>,
         @InjectRepository(Product) private readonly productRepository : Repository<Product>,
-        private readonly eventEmitter: EventEmitter2
+        private readonly eventEmitter: EventEmitter2,
+        private readonly inventoryService: InventoryService
     ) {}
 
-    async create (userId: string, email: string, createOrderDto: CreateOrderDto) {
-        // get all the productIds from order items
-        const productIds = createOrderDto.items.map((item) => item.productId)
+    async create( userId: string, email: string, createOrderDto: CreateOrderDto) {
+        const productIds = createOrderDto.items.map(
+            (item) => item.productId,
+        );
 
-        // find those products in the DB
-        const products = await this.productRepository.find({
-            where: productIds.map((id) =>({
-                id, 
-                isActive: true
-            }))
-        });
+        // Don't allow the same product twice in one order
+        const uniqueProductIds = [
+            ...new Set(productIds),
+        ].sort();
 
-        // make sure every requested product exists
-        if(products.length !== productIds.length) throw new NotFoundException("One or more products were not found");
-
-
-        // calculate the total order amount
-        let total = 0;
-
-        const orderItems = createOrderDto.items.map((item) => {
-            const product = products.find(
-                (p) => p.id === item.productId,
+        if (uniqueProductIds.length !== productIds.length) {
+            throw new BadRequestException(
+                'A product cannot appear multiple times in an order',
             );
+        }
 
-            if(!product) throw new NotFoundException(`Product ${item.productId} not found`);
+        const result = await this.orderRepository.manager.transaction(
+            async (manager) => {
+            // 1. Get products
 
-            const price = Number(product.price);
-            total += (price * item.quantity)
+                const products = await manager
+                    .getRepository(Product)
+                    .createQueryBuilder('product')
+                    .where('product.id IN (:...productIds)', {
+                        productIds: uniqueProductIds,
+                    })
+                    .andWhere('product.isActive = :isActive', {
+                        isActive: true,
+                    })
+                    .getMany();
 
-            return {
-                productId: product.id,
-                quantity: item.quantity,
-                price
-            };
-        });
+                if (products.length !== uniqueProductIds.length) {
+                    throw new NotFoundException(
+                        'One or more products were not found',
+                    );
+                }
 
-        const order = this.orderRepository.create({
-            userId,
-            status: OrderStatus.PENDING,
-            total,
-            items: orderItems as OrderItem[]
-        });
+                // 2. Check + reserve inventory
 
-        const savedOrder = await this.orderRepository.save(order);
+                let total = 0;
+
+                const orderItems: Partial<OrderItem>[] = [];
+
+                for (const item of createOrderDto.items) {
+                    const product = products.find((p) => p.id === item.productId);
+
+                    if (!product) {
+                        throw new NotFoundException(
+                            `Product ${item.productId} not found`,
+                        );
+                    }
+
+                    const price = Number(product.price);
+
+                    total += price * item.quantity;
+
+                    await this.inventoryService.reserveStock(manager, product.id, item.quantity);
+
+                    orderItems.push({
+                        productId: product.id,
+                        quantity: item.quantity,
+                        price,
+                    });
+                }
+
+                // 3. Create order
+
+                const order = manager.getRepository(Order).create({
+                    userId,
+                    status: OrderStatus.PENDING,
+                    total,
+                    items: orderItems as OrderItem[],
+                });
+
+                const savedOrder = await manager
+                    .getRepository(Order)
+                    .save(order);
+
+                return {
+                    savedOrder,
+                    orderItems,
+                };
+            },
+        );
+
+        // 4. Only AFTER COMMIT emit event
 
         this.eventEmitter.emit(
             'order.created',
             new OrderCreatedEvent(
-                savedOrder.id,
-                email,
-                orderItems.map((item) => ({
-                    productId: item.productId,
-                    quantity: item.quantity
-                })),
-            )
+            result.savedOrder.id,
+            email,
+            result.orderItems.map((item) => ({
+                productId: item.productId!,
+                quantity: item.quantity!,
+            })),
+            ),
         );
 
         return {
-            message: "Order created successfully.",
-            data: order
-        }
+            message: 'Order created successfully.',
+            data: result.savedOrder,
+        };
     }
+
 }

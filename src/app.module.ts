@@ -56,7 +56,7 @@ import { OrdersModule } from './ecomm/orders/orders.module';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
         autoLoadEntities: true,
-        synchronize: true, // Don't use true in production
+        // synchronize: true, // Don't use true in production
       }),
     }),
     ThrottlerModule.forRoot({

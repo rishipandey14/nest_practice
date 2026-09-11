@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Inventory } from './entity/inventory.entity';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { Product } from '../products/entity/products.entity';
 import { UpdateInventoryDto } from './DTO/updateInventory.dto';
 import { OnEvent } from '@nestjs/event-emitter';
@@ -59,21 +59,25 @@ export class InventoryService {
         return this.inventoryRepository.save(inventory);
     }
 
-    @OnEvent('order.created')
-    async handleOrderCreated (event : OrderCreatedEvent) {
-        for(const item of event.items) {
-            await this.reserveStock(
-                event.orderId,
-                item.productId,
-                item.quantity
-            )
-        }
-    };
+    // @OnEvent('order.created')
+    // async handleOrderCreated (event : OrderCreatedEvent) {
+    //     for(const item of event.items) {
+    //         await this.reserveStock(
+    //             item.productId,
+    //             item.quantity
+    //         )
+    //     }
+    // };
 
-    async reserveStock( orderId: string, productId: string, quantity: number) : Promise<Inventory> {
-        const inventory = await this.inventoryRepository.findOne({
-            where: {productId}
-        });
+    async reserveStock( manager: EntityManager, productId: string, quantity: number) : Promise<Inventory> {
+        const inventory = await manager
+            .getRepository(Inventory)
+            .createQueryBuilder('inventory')
+            .setLock('pessimistic_write')
+            .where('inventory.productId = :productId', {
+                productId,
+            })
+            .getOne();
 
         if(!inventory) throw new NotFoundException(`Inventory not found for product: ${productId}`);
 
@@ -81,6 +85,8 @@ export class InventoryService {
         if(availableQuantity < quantity) throw new BadRequestException(`Insufficient stock for product ${productId}`);
 
         inventory.reservedQuantity += quantity;
-        return this.inventoryRepository.save(inventory);
+        return manager
+            .getRepository(Inventory)
+            .save(inventory);
     }
 }
