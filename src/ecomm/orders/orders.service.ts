@@ -30,25 +30,17 @@ export class OrdersService {
             ...new Set(productIds),
         ].sort();
 
-        if (uniqueProductIds.length !== productIds.length) {
-            throw new BadRequestException(
-                'A product cannot appear multiple times in an order',
-            );
-        }
+        if (uniqueProductIds.length !== productIds.length) throw new BadRequestException('A product cannot appear multiple times in an order');
 
         const result = await this.orderRepository.manager.transaction(
             async (manager) => {
-            // 1. Get products
+                // 1. Get products
 
                 const products = await manager
                     .getRepository(Product)
                     .createQueryBuilder('product')
-                    .where('product.id IN (:...productIds)', {
-                        productIds: uniqueProductIds,
-                    })
-                    .andWhere('product.isActive = :isActive', {
-                        isActive: true,
-                    })
+                    .where('product.id IN (:...productIds)', { productIds: uniqueProductIds })
+                    .andWhere('product.isActive = :isActive', { isActive: true })
                     .getMany();
 
                 if (products.length !== uniqueProductIds.length) {
@@ -66,11 +58,7 @@ export class OrdersService {
                 for (const item of createOrderDto.items) {
                     const product = products.find((p) => p.id === item.productId);
 
-                    if (!product) {
-                        throw new NotFoundException(
-                            `Product ${item.productId} not found`,
-                        );
-                    }
+                    if (!product) throw new NotFoundException(`Product ${item.productId} not found`);
 
                     const price = Number(product.price);
 
@@ -110,12 +98,12 @@ export class OrdersService {
         this.eventEmitter.emit(
             'order.created',
             new OrderCreatedEvent(
-            result.savedOrder.id,
-            email,
-            result.orderItems.map((item) => ({
-                productId: item.productId!,
-                quantity: item.quantity!,
-            })),
+                result.savedOrder.id,
+                email,
+                result.orderItems.map((item) => ({
+                    productId: item.productId!,
+                    quantity: item.quantity!,
+                })),
             ),
         );
 

@@ -10,12 +10,7 @@ import { VideoController } from './video.controller';
 import { VideoProcessor } from './video.worker';
 import { VideoQueueEventsListener } from './video.queue.events';
 import { MailModule } from './mail/mail.module';
-import {
-  minutes,
-  seconds,
-  ThrottlerGuard,
-  ThrottlerModule,
-} from '@nestjs/throttler';
+import { minutes, seconds, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import { CacheModule } from '@nestjs/cache-manager';
