@@ -111,4 +111,29 @@ export class RolesService {
             throw new BadRequestException('One or more permission IDs are invalid');
         }
     }
+
+    async getRolesWithPermissions(role_id: number) {
+        const roles = await this.roleModel.aggregate([
+            {
+                $match: {id: role_id},
+            },
+            {
+                $lookup: {
+                    from: 'permissions',
+                    localField: 'permission_ids',
+                    foreignField: 'id',
+                    as: 'permissions',
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    id: 1,
+                    name: 1,
+                    permissions: '$permissions.key',
+                },
+            },
+        ]);
+        return roles[0] ?? null;
+    }
 }

@@ -1,11 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { Role } from '../user.types';
 
-export type UserDocument = HydratedDocument<User>;
+export type MongoUserDocument = HydratedDocument<MongoUser>;
 
 @Schema({timestamps: true})
-export class User {
+export class MongoUser {
   @Prop({required: true})
   name!: string;
 
@@ -25,5 +24,5 @@ export class User {
   password !: string;
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
-UserSchema.index({ email: 1 }, { unique: true });
+export const MongoUserSchema = SchemaFactory.createForClass(MongoUser);
+MongoUserSchema.index({ email: 1 }, { unique: true });

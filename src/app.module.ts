@@ -1,4 +1,4 @@
-import { ExecutionContext, Module } from '@nestjs/common';
+import { ExecutionContext, MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -24,6 +24,9 @@ import { CategoryModule } from './ecomm/category/category.module';
 import { InventoryModule } from './ecomm/inventory/inventory.module';
 import { EventEmitterModule} from '@nestjs/event-emitter'
 import { OrdersModule } from './ecomm/orders/orders.module';
+import { DatabaseAccessMiddleware } from './shared/database-access/middleware/databaseAccess.middleware';
+import { DatabaseAccessModule } from './shared/database-access/databaseAccess.module';
+import { UserDbModule } from './userDbMapping/userDbMapping.module';
 
 @Module({
   imports: [
@@ -51,7 +54,7 @@ import { OrdersModule } from './ecomm/orders/orders.module';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
         autoLoadEntities: true,
-        // synchronize: true, // Don't use true in production
+        synchronize: true, // Don't use true in production
       }),
     }),
     ThrottlerModule.forRoot({
@@ -113,7 +116,7 @@ import { OrdersModule } from './ecomm/orders/orders.module';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
         return {
-          ttl: 60 * 1000,
+          ttl: 1000,
           stores: new KeyvRedis(configService.get<string>('REDIS_URL'))
         }
       }
@@ -126,7 +129,9 @@ import { OrdersModule } from './ecomm/orders/orders.module';
     ProductsModule,
     CategoryModule,
     InventoryModule,
-    OrdersModule
+    OrdersModule,
+    DatabaseAccessModule,
+    UserDbModule,
   ],
   controllers: [AppController, VideoController],
   providers: [
@@ -139,4 +144,24 @@ import { OrdersModule } from './ecomm/orders/orders.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(DatabaseAccessMiddleware)
+      // .exclude(
+      //   {
+      //     path: 'auth/register',
+      //     method: RequestMethod.POST,
+      //   },
+      //   {
+      //     path: 'auth/login',
+      //     method: RequestMethod.POST,
+      //   },
+      //   {
+      //     path: 'roles/:id',
+      //     method: RequestMethod.PATCH,
+      //   },
+      // )
+      .forRoutes('*');
+  }
+}

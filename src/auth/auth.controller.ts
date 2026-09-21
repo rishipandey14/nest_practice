@@ -13,17 +13,17 @@ export class AuthController {
         this.authService = authService;
     }
 
-    @SkipAuth()
-    @Post('register') 
-    Register(@Body() registerUserDto: RegisterUserDTO) {
-        return this.authService.RegisterUser(registerUserDto);
-    }
+    // @SkipAuth()
+    // @Post('register') 
+    // Register(@Body() registerUserDto: RegisterUserDTO) {
+    //     return this.authService.RegisterUser(registerUserDto);
+    // }
 
-    @SkipAuth()
-    @Post('register/seller') 
-    RegisterSeller(@Body() registerUserDto: RegisterUserDTO) {
-        return this.authService.RegisterSeller(registerUserDto);
-    }
+    // @SkipAuth()
+    // @Post('register/seller') 
+    // RegisterSeller(@Body() registerUserDto: RegisterUserDTO) {
+    //     return this.authService.RegisterSeller(registerUserDto);
+    // }
 
     @SkipAuth()
     @Post('login')
@@ -31,14 +31,14 @@ export class AuthController {
         return this.authService.LoginUser(loginUserDto);
     }
 
-    @Post('forgot-password')
-    ForgotPassword(@Body() forgotPasswordDto: ForgotPasswordDTO) {
-        return this.authService.ForgotPassword(forgotPasswordDto);
-    }
+    // @Post('forgot-password')
+    // ForgotPassword(@Body() forgotPasswordDto: ForgotPasswordDTO) {
+    //     return this.authService.ForgotPassword(forgotPasswordDto);
+    // }
 
-    @SkipAuth()
-    @Post('reset-password')
-    ResetPassword(@Body() resetPasswordDto: ResetPasswordDTO) {
-        return this.authService.ResetPassword(resetPasswordDto);
-    }
+    // @SkipAuth()
+    // @Post('reset-password')
+    // ResetPassword(@Body() resetPasswordDto: ResetPasswordDTO) {
+    //     return this.authService.ResetPassword(resetPasswordDto);
+    // }
 }

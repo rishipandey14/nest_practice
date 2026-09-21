@@ -24,166 +24,166 @@ export class AuthService {
         private readonly passwordResetTokenModel: Model<PasswordResetToken>
     ) {}
 
-    async RegisterUser(registerUserDto: RegisterUserDTO) {
+    // async RegisterUser(registerUserDto: RegisterUserDTO) {
 
-        const saltRound = 10;
-        const hashedPassword = await bcrypt.hash(registerUserDto.password, saltRound);
-        // Logic for User Registeration
-        /**
-         * Check if email already exist
-         * hash the password
-         * store the user in DataBase
-         * generate JWT Token
-         * return token in response
-         */
-        const user = await this.userService.createUser(
-            registerUserDto, 
-            hashedPassword,
-            SYSTEM_ROLE_IDS.USER,
-        );
+    //     const saltRound = 10;
+    //     const hashedPassword = await bcrypt.hash(registerUserDto.password, saltRound);
+    //     // Logic for User Registeration
+    //     /**
+    //      * Check if email already exist
+    //      * hash the password
+    //      * store the user in DataBase
+    //      * generate JWT Token
+    //      * return token in response
+    //      */
+    //     const user = await this.userService.createUser(
+    //         registerUserDto, 
+    //         hashedPassword,
+    //         SYSTEM_ROLE_IDS.USER,
+    //     );
 
-        await this.mailService.sendWelcomeEmail(
-            user.email,
-            user.name
-        )
+    //     await this.mailService.sendWelcomeEmail(
+    //         user.email,
+    //         user.name
+    //     )
 
-        const payload = {
-            sub: user._id,
-            email: user.email,
-            role_id: user.role_id
-        }
-        const token = await this.jwtService.signAsync(payload);
+    //     const payload = {
+    //         sub: user._id,
+    //         email: user.email,
+    //         role_id: user.role_id
+    //     }
+    //     const token = await this.jwtService.signAsync(payload);
 
-        return {
-            message: 'User registered successfully',
-            access_token: token,
-        };
-    }
+    //     return {
+    //         message: 'User registered successfully',
+    //         access_token: token,
+    //     };
+    // }
 
 
-    async RegisterSeller(registerUserDto: RegisterUserDTO) {
+    // async RegisterSeller(registerUserDto: RegisterUserDTO) {
 
-        const saltRound = 10;
-        const hashedPassword = await bcrypt.hash(registerUserDto.password, saltRound);
-        // Logic for User Registeration
-        /**
-         * Check if email already exist
-         * hash the password
-         * store the user in DataBase
-         * generate JWT Token
-         * return token in response
-         */
-        const user = await this.userService.createUser(
-            registerUserDto, 
-            hashedPassword,
-            SYSTEM_ROLE_IDS.SELLER,
-        );
+    //     const saltRound = 10;
+    //     const hashedPassword = await bcrypt.hash(registerUserDto.password, saltRound);
+    //     // Logic for User Registeration
+    //     /**
+    //      * Check if email already exist
+    //      * hash the password
+    //      * store the user in DataBase
+    //      * generate JWT Token
+    //      * return token in response
+    //      */
+    //     const user = await this.userService.createUser(
+    //         registerUserDto, 
+    //         hashedPassword,
+    //         SYSTEM_ROLE_IDS.SELLER,
+    //     );
 
-        await this.mailService.sendWelcomeEmail(
-            user.email,
-            user.name
-        )
+    //     await this.mailService.sendWelcomeEmail(
+    //         user.email,
+    //         user.name
+    //     )
 
-        const payload = {
-            sub: user._id,
-            email: user.email,
-            role_id: user.role_id
-        }
-        const token = await this.jwtService.signAsync(payload);
+    //     const payload = {
+    //         sub: user._id,
+    //         email: user.email,
+    //         role_id: user.role_id
+    //     }
+    //     const token = await this.jwtService.signAsync(payload);
 
-        return {
-            message: 'Seller registered successfully',
-            access_token: token,
-        };
-    }
+    //     return {
+    //         message: 'Seller registered successfully',
+    //         access_token: token,
+    //     };
+    // }
 
-    async ForgotPassword(forgotPasswordDto: ForgotPasswordDTO) {
-        /**
-         * find user
-         * generate reset token
-         * hash token + save to db
-         * push email job in queue
-         * email worker picks up
-         * send reset link
-         */
+    // async ForgotPassword(forgotPasswordDto: ForgotPasswordDTO) {
+    //     /**
+    //      * find user
+    //      * generate reset token
+    //      * hash token + save to db
+    //      * push email job in queue
+    //      * email worker picks up
+    //      * send reset link
+    //      */
 
-        const {email} = forgotPasswordDto;
+    //     const {email} = forgotPasswordDto;
 
-        const user = await this.userService.findByEmail(email);
+    //     const user = await this.userService.findByEmail(email);
 
-        if(!user) return {
-            message: "if an account exists with this email, a reset link has been sent."
-        }
+    //     if(!user) return {
+    //         message: "if an account exists with this email, a reset link has been sent."
+    //     }
 
-        const raw_token = randomBytes(32).toString('hex');
-        const token_hash = createHash('sha256')
-            .update(raw_token)
-            .digest('hex')
+    //     const raw_token = randomBytes(32).toString('hex');
+    //     const token_hash = createHash('sha256')
+    //         .update(raw_token)
+    //         .digest('hex')
         
-        const expires_at = new Date(Date.now() + 15 * 60 * 1000 );  // 15 min
+    //     const expires_at = new Date(Date.now() + 15 * 60 * 1000 );  // 15 min
 
-        // delete previous unused token
-        await this.passwordResetTokenModel.deleteMany({
-            user_id: user._id,
-            used_at: null
-        });
+    //     // delete previous unused token
+    //     await this.passwordResetTokenModel.deleteMany({
+    //         user_id: user._id,
+    //         used_at: null
+    //     });
 
-        await this.passwordResetTokenModel.create({
-            user_id: user._id,
-            token_hash: token_hash,
-            expires_at: expires_at
-        });
+    //     await this.passwordResetTokenModel.create({
+    //         user_id: user._id,
+    //         token_hash: token_hash,
+    //         expires_at: expires_at
+    //     });
 
-        await this.mailService.sendResetPasswordMail(email, raw_token);
+    //     await this.mailService.sendResetPasswordMail(email, raw_token);
         
-        return {
-            message: "if an account exists with this email, a reset link has been sent."
-        }
-    }
+    //     return {
+    //         message: "if an account exists with this email, a reset link has been sent."
+    //     }
+    // }
 
-    async ResetPassword(resetPasswordDto: ResetPasswordDTO) {
-        const {token} = resetPasswordDto;
+    // async ResetPassword(resetPasswordDto: ResetPasswordDTO) {
+    //     const {token} = resetPasswordDto;
 
-        // 1-> Hash the token received
-        const token_hash = createHash('sha256').update(token).digest('hex');
+    //     // 1-> Hash the token received
+    //     const token_hash = createHash('sha256').update(token).digest('hex');
 
-        // console.log('token hash ->' , token_hash);
+    //     // console.log('token hash ->' , token_hash);
 
-        // 2 -> Find the token in DB
-        const reset_token = await this.passwordResetTokenModel.findOne({
-            token_hash
-        });
+    //     // 2 -> Find the token in DB
+    //     const reset_token = await this.passwordResetTokenModel.findOne({
+    //         token_hash
+    //     });
 
-        // console.log('reset token ->' , reset_token);
+    //     // console.log('reset token ->' , reset_token);
 
-        // 3-> Token doesn't exist
-        if(!reset_token) throw new BadRequestException('Invalid or Expired reset token.');
+    //     // 3-> Token doesn't exist
+    //     if(!reset_token) throw new BadRequestException('Invalid or Expired reset token.');
         
-        // 4-> Token has already been used 
-        if(reset_token.used_at) throw new BadRequestException('Reset token has already been used.');
+    //     // 4-> Token has already been used 
+    //     if(reset_token.used_at) throw new BadRequestException('Reset token has already been used.');
 
-        // 5 -> token has been expired
-        if(reset_token.expires_at < new Date()) throw new BadRequestException('Reset token has been expired.');
+    //     // 5 -> token has been expired
+    //     if(reset_token.expires_at < new Date()) throw new BadRequestException('Reset token has been expired.');
 
-        const user = await this.userService.findById(reset_token.user_id);
+    //     const user = await this.userService.findById(reset_token.user_id);
 
-        if(!user) throw new BadRequestException('user not found.');
+    //     if(!user) throw new BadRequestException('user not found.');
 
-        const hashed_password = await bcrypt.hash(resetPasswordDto.new_password, 10);
+    //     const hashed_password = await bcrypt.hash(resetPasswordDto.new_password, 10);
 
-        await this.userService.updatePassword(user._id, hashed_password);
+    //     await this.userService.updatePassword(user._id, hashed_password);
 
-        await this.passwordResetTokenModel.findByIdAndUpdate(
-            reset_token._id,
-            {used_at: new Date()},
-        );
+    //     await this.passwordResetTokenModel.findByIdAndUpdate(
+    //         reset_token._id,
+    //         {used_at: new Date()},
+    //     );
 
-        await this.mailService.sendPasswordChangeConfirmationMail(user.email);
+    //     await this.mailService.sendPasswordChangeConfirmationMail(user.email);
 
-        return {
-            message: "Password reset successfully"
-        }
-    }
+    //     return {
+    //         message: "Password reset successfully"
+    //     }
+    // }
 
     async LoginUser(loginUserDto: LoginUserDTO) {
         // console.log(loginUserDto);
@@ -197,9 +197,9 @@ export class AuthService {
         if(!isPasswordValid) throw new UnauthorizedException('Invalid email or password');
         
         const payload = {
-            sub: user._id,
+            sub: user.id,
             email: user.email,
-            role_id: user.role_id
+            role_id: user.roleId
         }
         console.log("User logged in details; ", user);
         const token = await this.jwtService.signAsync(payload);
