@@ -7,11 +7,11 @@ import { CreateCategoryDto } from './DTO/createCategory.dto';
 @Injectable()
 export class CategoryService {
     constructor(
-        @InjectRepository(Category) private readonly categoryRepository : Repository<Category>
+        @InjectRepository(Category)
+        private readonly categoryRepository: Repository<Category>,
     ) {}
 
-
-    async create(createCategoryDto: CreateCategoryDto ){
+    async create(createCategoryDto: CreateCategoryDto) {
         const existingCategory = await this.categoryRepository.findOne({
             where: {
                 name: createCategoryDto.name,
@@ -25,7 +25,7 @@ export class CategoryService {
         this.categoryRepository.save(category);
 
         return {
-            message: `Category: ${createCategoryDto.name} created successfully.`
+            message: `Category: ${createCategoryDto.name} created successfully.`,
         };
     }
 

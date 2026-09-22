@@ -11,19 +11,21 @@ import { ProductCreatedEvent } from './events/productCreated.events';
 @Injectable()
 export class ProductsService {
     constructor(
-        @InjectRepository(Product) private readonly productRepository : Repository<Product> ,
-        @InjectRepository(Category) private readonly categoryRepository : Repository<Category> ,
+        @InjectRepository(Product)
+        private readonly productRepository: Repository<Product>,
+        @InjectRepository(Category)
+        private readonly categoryRepository: Repository<Category>,
         private readonly eventEmitter: EventEmitter2,
     ) {}
 
     async create(createProductDto: CreateProductDto) {
         const category = await this.categoryRepository.findOne({
             where: {
-            id: createProductDto.categoryId,
+                id: createProductDto.categoryId,
             },
         });
 
-        if(!category) throw new NotFoundException('Category not found');
+        if (!category) throw new NotFoundException('Category not found');
 
         const product = this.productRepository.create({
             name: createProductDto.name,
@@ -37,15 +39,15 @@ export class ProductsService {
 
         this.eventEmitter.emit(
             'product.created',
-            new ProductCreatedEvent(savedProduct.id, createProductDto.stock)
-        )
+            new ProductCreatedEvent(savedProduct.id, createProductDto.stock),
+        );
 
         return {
-            message: "Product created successfully."
+            message: 'Product created successfully.',
         };
     }
 
-    async findAll() : Promise<Product[]> {
+    async findAll(): Promise<Product[]> {
         return this.productRepository.find();
     }
 
@@ -56,7 +58,7 @@ export class ProductsService {
         });
 
         if (!product) {
-        throw new NotFoundException(`Product with ID ${id} not found`);
+            throw new NotFoundException(`Product with ID ${id} not found`);
         }
 
         return product;
@@ -70,8 +72,8 @@ export class ProductsService {
         this.productRepository.save(product);
 
         return {
-            message: "Product updated successfully."
-        }
+            message: 'Product updated successfully.',
+        };
     }
 
     // Delete
@@ -80,7 +82,7 @@ export class ProductsService {
 
         await this.productRepository.remove(product);
         return {
-            message: "Product deleted successfully"
+            message: 'Product deleted successfully',
         };
     }
 }

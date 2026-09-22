@@ -13,45 +13,39 @@ import { UserRepository } from './domain/repositories/Iuser.repository';
 import { DatabaseRequest } from 'src/shared/database-access/database-request';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([
-      { 
-        name: MongoUser.name, 
-        schema: MongoUserSchema
-      }
-    ]),
-    TypeOrmModule.forFeature([
-      UserEntity,
-    ]),
-  ],
-  providers: [
-    MongoUserRepository,
-    PostgresUserRepository,
-    {
-      provide: USER_REPOSITORY,
-      scope: Scope.REQUEST,
-
-      inject: [
-        REQUEST,
+    imports: [
+        MongooseModule.forFeature([
+            {
+                name: MongoUser.name,
+                schema: MongoUserSchema,
+            },
+        ]),
+        TypeOrmModule.forFeature([UserEntity]),
+    ],
+    providers: [
         MongoUserRepository,
-        PostgresUserRepository
-      ],
-      useFactory: (
-        req: DatabaseRequest,
-        mongoRepository: MongoUserRepository,
-        postgresRepository: PostgresUserRepository,
-      ) : UserRepository => {
-        const database = req.dbContext?.database
+        PostgresUserRepository,
+        {
+            provide: USER_REPOSITORY,
+            scope: Scope.REQUEST,
 
-        if(!database) throw new Error("Database context has not been initialized");
+            inject: [REQUEST, MongoUserRepository, PostgresUserRepository],
+            useFactory: (
+                req: DatabaseRequest,
+                mongoRepository: MongoUserRepository,
+                postgresRepository: PostgresUserRepository,
+            ): UserRepository => {
+                const database = req.dbContext?.database;
 
-        if(database === 'mongodb') return mongoRepository;
-        return postgresRepository;
-      }
-    },
-    UserService
-  ],
-  exports: [UserService],
-  controllers: [UserController]
+                if (!database) throw new Error('Database context has not been initialized');
+
+                if (database === 'mongodb') return mongoRepository;
+                return postgresRepository;
+            },
+        },
+        UserService,
+    ],
+    exports: [UserService],
+    controllers: [UserController],
 })
 export class UserModule {}

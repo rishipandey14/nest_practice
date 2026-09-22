@@ -11,34 +11,34 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
 
 @Module({
-  imports: [
-    UserModule,
-    ConfigModule,
-    MailModule,
-    MongooseModule.forFeature([
-      {
-        name: PasswordResetToken.name,
-        schema: PasswordResetTokenSchema
-      }
-    ]),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: {
-          expiresIn: '1h',
+    imports: [
+        UserModule,
+        ConfigModule,
+        MailModule,
+        MongooseModule.forFeature([
+            {
+                name: PasswordResetToken.name,
+                schema: PasswordResetTokenSchema,
+            },
+        ]),
+        JwtModule.registerAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: (configService: ConfigService) => ({
+                secret: configService.get<string>('JWT_SECRET'),
+                signOptions: {
+                    expiresIn: '1h',
+                },
+            }),
+        }),
+    ],
+    controllers: [AuthController],
+    providers: [
+        AuthService,
+        {
+            provide: APP_GUARD,
+            useClass: AuthGuard,
         },
-      }),
-    }),
-  ],
-  controllers: [AuthController],
-  providers: [
-    AuthService,
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
-  ],
+    ],
 })
 export class AuthModule {}

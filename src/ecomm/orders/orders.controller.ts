@@ -4,10 +4,10 @@ import { CreateOrderDto } from './DTO/createOrder.dto';
 
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+    constructor(private readonly ordersService: OrdersService) {}
 
-  @Post()
-  create( @Req() req: any, @Body() createOrderDto: CreateOrderDto ) {
-    return this.ordersService.create(req.user.sub, req.user.email, createOrderDto);
-  }
+    @Post()
+    create(@Req() req: any, @Body() createOrderDto: CreateOrderDto) {
+        return this.ordersService.create(req.user.sub, req.user.email, createOrderDto);
+    }
 }

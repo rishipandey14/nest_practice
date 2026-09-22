@@ -1,17 +1,14 @@
-import { IsArray, IsInt, IsLowercase, IsNotEmpty, IsString } from "class-validator";
-
-
+import { IsArray, IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateRoleDTO {
-    
     @IsString()
     @IsNotEmpty()
-    name !: string;
+    name!: string;
 
     @IsString()
-    description !: string;
-    
+    description!: string;
+
     @IsArray()
-    @IsInt({each: true})
-    permission_ids !: number[];
+    @IsInt({ each: true })
+    permission_ids!: number[];
 }

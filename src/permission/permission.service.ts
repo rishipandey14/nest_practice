@@ -7,7 +7,8 @@ import { PermissionsSeed } from './permission.seed';
 @Injectable()
 export class PermissionService {
     constructor(
-        @InjectModel(Permission.name) private readonly permissionModel: Model<PermissionDocument> 
+        @InjectModel(Permission.name)
+        private readonly permissionModel: Model<PermissionDocument>,
     ) {}
 
     async SeedPermissions() {
@@ -20,13 +21,13 @@ export class PermissionService {
                     $set: {
                         key: permission.key,
                         Description: permission.description,
-                    }
+                    },
                 },
                 {
                     upsert: true,
-                }
-            )
+                },
+            );
         }
-        console.log("Permission seeded successfully");
+        console.log('Permission seeded successfully');
     }
 }

@@ -1,11 +1,11 @@
-import { User } from "../entity/user.entity";
+import { User } from '../entity/user.entity';
 
 export interface UserRepository {
-  findById(id: string): Promise<User | null>;
+    findById(id: string): Promise<User | null>;
 
-  findByEmail(email: string): Promise<User | null>;
+    findByEmail(email: string): Promise<User | null>;
 
-  getAllUser(): Promise<User[]>;
+    getAllUser(): Promise<User[]>;
 
-  // updatePassword( id: string, hashedPassword: string ): Promise<User | null>;
+    // updatePassword( id: string, hashedPassword: string ): Promise<User | null>;
 }

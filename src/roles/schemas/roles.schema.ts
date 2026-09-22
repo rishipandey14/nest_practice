@@ -1,15 +1,15 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument } from "mongoose";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
 
 export type RolesDocument = HydratedDocument<Roles>;
 
-@Schema({timestamps: true})
+@Schema({ timestamps: true })
 export class Roles {
     @Prop({
         required: true,
         unique: true,
     })
-    id !: number;
+    id!: number;
 
     @Prop({
         required: true,
@@ -17,24 +17,24 @@ export class Roles {
         lowercase: true,
         trim: true,
     })
-    name !: string;
+    name!: string;
 
     @Prop({
         default: '',
         trim: true,
     })
-    description !: string;
+    description!: string;
 
     @Prop({
         type: [Number],
         default: [],
     })
-    permission_ids !: number[];
+    permission_ids!: number[];
 
     @Prop({
         default: false,
     })
-    isSystemRole !: boolean;
+    isSystemRole!: boolean;
 }
 
 export const RolesSchema = SchemaFactory.createForClass(Roles);

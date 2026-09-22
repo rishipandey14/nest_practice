@@ -8,26 +8,26 @@ import { PermissionGuard } from './guards/permission.guard';
 import { Roles, RolesSchema } from 'src/roles/schemas/roles.schema';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([
-      {
-        name: Permission.name,
-        schema: PermissionSchema,
-      },
-      {
-        name: Roles.name,
-        schema: RolesSchema
-      }
-    ]),
-  ],
-  controllers: [PermissionController],
-  providers: [
-    PermissionService,
-    {
-      provide: APP_GUARD,
-      useClass: PermissionGuard,
-    }
-  ],
-  exports: [PermissionService]
+    imports: [
+        MongooseModule.forFeature([
+            {
+                name: Permission.name,
+                schema: PermissionSchema,
+            },
+            {
+                name: Roles.name,
+                schema: RolesSchema,
+            },
+        ]),
+    ],
+    controllers: [PermissionController],
+    providers: [
+        PermissionService,
+        {
+            provide: APP_GUARD,
+            useClass: PermissionGuard,
+        },
+    ],
+    exports: [PermissionService],
 })
 export class PermissionModule {}

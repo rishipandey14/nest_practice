@@ -1,4 +1,9 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException} from '@nestjs/common';
+import {
+    BadRequestException,
+    ConflictException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Roles, RolesDocument } from './schemas/roles.schema';
@@ -8,15 +13,16 @@ import { UpdateRoleDTO } from './DTO/updateRole.dto';
 
 @Injectable()
 export class RolesService {
-    constructor( 
+    constructor(
         @InjectModel(Roles.name) private readonly roleModel: Model<RolesDocument>,
-        @InjectModel(Permission.name) private readonly permissionModel: Model<PermissionDocument>,
+        @InjectModel(Permission.name)
+        private readonly permissionModel: Model<PermissionDocument>,
     ) {}
 
     async createRole(dto: CreateRoleDTO) {
         // Check duplicate role name
         const existingRole = await this.roleModel.findOne({
-            name: dto.name.toLowerCase()
+            name: dto.name.toLowerCase(),
         });
 
         if (existingRole) {
@@ -34,7 +40,7 @@ export class RolesService {
             id: nextId,
             name: dto.name.toLowerCase(),
             description: dto.description ?? '',
-            permission_ids: dto.permission_ids
+            permission_ids: dto.permission_ids,
         });
     }
 
@@ -115,7 +121,7 @@ export class RolesService {
     async getRolesWithPermissions(role_id: number) {
         const roles = await this.roleModel.aggregate([
             {
-                $match: {id: role_id},
+                $match: { id: role_id },
             },
             {
                 $lookup: {

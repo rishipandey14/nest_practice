@@ -4,16 +4,15 @@ import { CreateCategoryDto } from './DTO/createCategory.dto';
 
 @Controller('category')
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+    constructor(private readonly categoryService: CategoryService) {}
 
+    @Post()
+    create(@Body() createCategoryDto: CreateCategoryDto) {
+        return this.categoryService.create(createCategoryDto);
+    }
 
-  @Post()
-  create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoryService.create(createCategoryDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.categoryService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.categoryService.findAll();
+    }
 }

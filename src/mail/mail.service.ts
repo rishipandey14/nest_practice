@@ -8,34 +8,28 @@ import { OrderCreatedItem } from 'src/ecomm/orders/events/orderCreated.event';
 export class MailService {
     constructor(
         @InjectQueue('email') private readonly emailQueue: Queue,
-        private readonly configService: ConfigService
+        private readonly configService: ConfigService,
     ) {}
 
     async sendWelcomeEmail(email: string, name: string) {
         await this.emailQueue.add('Welcome', {
             email,
-            name
+            name,
         });
     }
 
     async sendResetPasswordMail(email: string, raw_token: string) {
-        const url = this.configService.getOrThrow<string>('RESET_URL')
-        const reset_url = `${url}/reset-password?token=${raw_token}`
+        const url = this.configService.getOrThrow<string>('RESET_URL');
+        const reset_url = `${url}/reset-password?token=${raw_token}`;
 
-        await this.emailQueue.add(
-            'ResetPassword',
-            {
-                email,
-                reset_url,
-            },
-        );
+        await this.emailQueue.add('ResetPassword', {
+            email,
+            reset_url,
+        });
     }
 
     async sendPasswordChangeConfirmationMail(email: string) {
-        await this.emailQueue.add(
-            'PasswordChangedConfirmation',
-            {email},
-        );
+        await this.emailQueue.add('PasswordChangedConfirmation', { email });
     }
 
     async sendOrderConfirmationMail(data: {

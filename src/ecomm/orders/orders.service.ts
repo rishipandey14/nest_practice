@@ -13,85 +13,81 @@ import { InventoryService } from '../inventory/inventory.service';
 @Injectable()
 export class OrdersService {
     constructor(
-        @InjectRepository(Order) private readonly orderRepository : Repository<Order>,
-        @InjectRepository(OrderItem) private readonly orderItemRepository : Repository<OrderItem>,
-        @InjectRepository(Product) private readonly productRepository : Repository<Product>,
+        @InjectRepository(Order)
+        private readonly orderRepository: Repository<Order>,
+        @InjectRepository(OrderItem)
+        private readonly orderItemRepository: Repository<OrderItem>,
+        @InjectRepository(Product)
+        private readonly productRepository: Repository<Product>,
         private readonly eventEmitter: EventEmitter2,
-        private readonly inventoryService: InventoryService
+        private readonly inventoryService: InventoryService,
     ) {}
 
-    async create( userId: string, email: string, createOrderDto: CreateOrderDto) {
-        const productIds = createOrderDto.items.map(
-            (item) => item.productId,
-        );
+    async create(userId: string, email: string, createOrderDto: CreateOrderDto) {
+        const productIds = createOrderDto.items.map((item) => item.productId);
 
         // Don't allow the same product twice in one order
-        const uniqueProductIds = [
-            ...new Set(productIds),
-        ].sort();
+        const uniqueProductIds = [...new Set(productIds)].sort();
 
-        if (uniqueProductIds.length !== productIds.length) throw new BadRequestException('A product cannot appear multiple times in an order');
+        if (uniqueProductIds.length !== productIds.length)
+            throw new BadRequestException('A product cannot appear multiple times in an order');
 
-        const result = await this.orderRepository.manager.transaction(
-            async (manager) => {
-                // 1. Get products
+        const result = await this.orderRepository.manager.transaction(async (manager) => {
+            // 1. Get products
 
-                const products = await manager
-                    .getRepository(Product)
-                    .createQueryBuilder('product')
-                    .where('product.id IN (:...productIds)', { productIds: uniqueProductIds })
-                    .andWhere('product.isActive = :isActive', { isActive: true })
-                    .getMany();
+            const products = await manager
+                .getRepository(Product)
+                .createQueryBuilder('product')
+                .where('product.id IN (:...productIds)', {
+                    productIds: uniqueProductIds,
+                })
+                .andWhere('product.isActive = :isActive', { isActive: true })
+                .getMany();
 
-                if (products.length !== uniqueProductIds.length) {
-                    throw new NotFoundException(
-                        'One or more products were not found',
-                    );
-                }
+            if (products.length !== uniqueProductIds.length) {
+                throw new NotFoundException('One or more products were not found');
+            }
 
-                // 2. Check + reserve inventory
+            // 2. Check + reserve inventory
 
-                let total = 0;
+            let total = 0;
 
-                const orderItems: Partial<OrderItem>[] = [];
+            const orderItems: Partial<OrderItem>[] = [];
 
-                for (const item of createOrderDto.items) {
-                    const product = products.find((p) => p.id === item.productId);
+            for (const item of createOrderDto.items) {
+                const product = products.find((p) => p.id === item.productId);
 
-                    if (!product) throw new NotFoundException(`Product ${item.productId} not found`);
+                if (!product) throw new NotFoundException(`Product ${item.productId} not found`);
 
-                    const price = Number(product.price);
+                const price = Number(product.price);
 
-                    total += price * item.quantity;
+                total += price * item.quantity;
 
-                    await this.inventoryService.reserveStock(manager, product.id, item.quantity);
+                await this.inventoryService.reserveStock(manager, product.id, item.quantity);
 
-                    orderItems.push({
-                        productId: product.id,
-                        quantity: item.quantity,
-                        price,
-                    });
-                }
-
-                // 3. Create order
-
-                const order = manager.getRepository(Order).create({
-                    userId,
-                    status: OrderStatus.PENDING,
-                    total,
-                    items: orderItems as OrderItem[],
+                orderItems.push({
+                    productId: product.id,
+                    quantity: item.quantity,
+                    price,
                 });
+            }
 
-                const savedOrder = await manager
-                    .getRepository(Order)
-                    .save(order);
+            // 3. Create order
 
-                return {
-                    savedOrder,
-                    orderItems,
-                };
-            },
-        );
+            const order = manager.getRepository(Order).create({
+                userId,
+                status: OrderStatus.PENDING,
+                total,
+                items: orderItems as OrderItem[],
+            });
+
+            const savedOrder = await manager.getRepository(Order).save(order);
+
+            return {
+                savedOrder,
+                orderItems,
+            };
+        });
 
         // 4. Only AFTER COMMIT emit event
 
@@ -112,5 +108,4 @@ export class OrdersService {
             data: result.savedOrder,
         };
     }
-
 }

@@ -1,21 +1,20 @@
-import { Processor, WorkerHost } from "@nestjs/bullmq";
-import { Job } from "bullmq";
-import { EmailService } from "./email.service";
+import { Processor, WorkerHost } from '@nestjs/bullmq';
+import { Job } from 'bullmq';
+import { EmailService } from './email.service';
 
 interface WelcomeEmailJob {
-    name: string,
-    email: string
+    name: string;
+    email: string;
 }
 
 interface ResetPasswordEmailJob {
-    email: string,
-    reset_url: string
+    email: string;
+    reset_url: string;
 }
 
 interface PasswordChangeConfirmationEmailJob {
-    email: string
+    email: string;
 }
-
 
 interface OrderConfirmationEmailJob {
     email: string;
@@ -27,8 +26,7 @@ interface OrderConfirmationEmailJob {
     total: number;
 }
 
-
-@Processor('email', {concurrency: 2})
+@Processor('email', { concurrency: 2 })
 export class EmailProcessor extends WorkerHost {
     constructor(private readonly emailService: EmailService) {
         super();
@@ -37,54 +35,42 @@ export class EmailProcessor extends WorkerHost {
     async process(job: Job) {
         console.log(`Processing email job: ${job.name}`);
 
-        switch(job.name){
+        switch (job.name) {
             case 'Welcome': {
                 const data = job.data as WelcomeEmailJob;
 
-                await this.emailService.sendWelcomeEmail(
-                    data.email,
-                    data.name
-                )
-                console.log(`Welcome Email sent to: ${job.data.email}`)
+                await this.emailService.sendWelcomeEmail(data.email, data.name);
+                console.log(`Welcome Email sent to: ${job.data.email}`);
                 break;
             }
             case 'ResetPassword': {
                 const data = job.data as ResetPasswordEmailJob;
 
-                await this.emailService.sendResetPasswordEmail(
-                    data.email,
-                    data.reset_url
-                )
-                console.log(`Password reset Email sent to: ${data.email}`)
+                await this.emailService.sendResetPasswordEmail(data.email, data.reset_url);
+                console.log(`Password reset Email sent to: ${data.email}`);
                 break;
             }
 
             case 'PasswordChangedConfirmation': {
                 const data = job.data as PasswordChangeConfirmationEmailJob;
 
-                await this.emailService.sendPasswordChangedConfirmationEmail(
-                    data.email,
-                )
-                console.log(`Password changed confirmation email sent to: ${data.email}`)
+                await this.emailService.sendPasswordChangedConfirmationEmail(data.email);
+                console.log(`Password changed confirmation email sent to: ${data.email}`);
                 break;
             }
 
             case 'OrderConfirmation': {
-                const data =
-                    job.data as OrderConfirmationEmailJob;
+                const data = job.data as OrderConfirmationEmailJob;
 
-                await this.emailService
-                    .sendOrderConfirmationEmail(data);
+                await this.emailService.sendOrderConfirmationEmail(data);
 
-                console.log(
-                    `Order confirmation email sent to ${data.email}`,
-                );
+                console.log(`Order confirmation email sent to ${data.email}`);
 
                 break;
             }
 
             default:
-                throw new Error(`Unknown Email job: ${job.name}`)
+                throw new Error(`Unknown Email job: ${job.name}`);
         }
     }
-};
+}

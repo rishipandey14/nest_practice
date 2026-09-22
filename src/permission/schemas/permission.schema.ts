@@ -1,29 +1,29 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument } from "mongoose";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
 
 export type PermissionDocument = HydratedDocument<Permission>;
 
-@Schema({timestamps: true})
+@Schema({ timestamps: true })
 export class Permission {
     @Prop({
         required: true,
         unique: true,
     })
-    id !: number;
+    id!: number;
 
     @Prop({
         required: true,
         unique: true,
         lowercase: true,
-        trim: true
+        trim: true,
     })
-    key !: string;
+    key!: string;
 
     @Prop({
         required: true,
         trim: true,
     })
-    Description !: string;
+    Description!: string;
 }
 
 export const PermissionSchema = SchemaFactory.createForClass(Permission);

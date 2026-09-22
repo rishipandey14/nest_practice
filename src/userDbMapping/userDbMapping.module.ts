@@ -1,8 +1,7 @@
-import { Module } from "@nestjs/common";
-import { MongooseModule } from "@nestjs/mongoose";
-import { UserDb, UserDbSchema } from "./schema/userModuleMapping.schema";
-import { UserDbService } from "./userDbMapping.service";
-
+import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { UserDb, UserDbSchema } from './schema/userModuleMapping.schema';
+import { UserDbService } from './userDbMapping.service';
 
 @Module({
     imports: [
@@ -10,11 +9,10 @@ import { UserDbService } from "./userDbMapping.service";
             {
                 name: UserDb.name,
                 schema: UserDbSchema,
-            }
-        ])
+            },
+        ]),
     ],
     providers: [UserDbService],
     exports: [UserDbService],
 })
-
 export class UserDbModule {}

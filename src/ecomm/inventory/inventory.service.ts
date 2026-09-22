@@ -6,44 +6,46 @@ import { Product } from '../products/entity/products.entity';
 import { UpdateInventoryDto } from './DTO/updateInventory.dto';
 import { OnEvent } from '@nestjs/event-emitter';
 import { ProductCreatedEvent } from '../products/events/productCreated.events';
-import { OrderCreatedEvent } from '../orders/events/orderCreated.event';
+// import { OrderCreatedEvent } from '../orders/events/orderCreated.event';
 
 @Injectable()
 export class InventoryService {
     constructor(
-        @InjectRepository(Inventory) private readonly inventoryRepository : Repository<Inventory>,
-        @InjectRepository(Product) private readonly productRepository : Repository<Product>,
+        @InjectRepository(Inventory)
+        private readonly inventoryRepository: Repository<Inventory>,
+        @InjectRepository(Product)
+        private readonly productRepository: Repository<Product>,
     ) {}
 
     @OnEvent('product.created')
-    async handleProductCreated (event: ProductCreatedEvent) {
+    async handleProductCreated(event: ProductCreatedEvent) {
         await this.createForProduct(event.productId, event.stockNumber);
     }
 
-    async createForProduct (productId: string, initialStock: number) : Promise<Inventory> {
+    async createForProduct(productId: string, initialStock: number): Promise<Inventory> {
         const product = await this.productRepository.findOne({
-            where: {id: productId}
+            where: { id: productId },
         });
 
-        if(!product) throw new NotFoundException('Product not found.');
+        if (!product) throw new NotFoundException('Product not found.');
 
         const existingInventory = await this.inventoryRepository.findOne({
-            where: {productId}
+            where: { productId },
         });
 
-        if(existingInventory) return existingInventory;
+        if (existingInventory) return existingInventory;
 
         const inventory = await this.inventoryRepository.create({
             productId,
             quantity: initialStock,
-            reservedQuantity: 0
+            reservedQuantity: 0,
         });
         return this.inventoryRepository.save(inventory);
-    };
+    }
 
     async findByProductId(productId: string): Promise<Inventory> {
         const inventory = await this.inventoryRepository.findOne({
-            where: { productId }
+            where: { productId },
         });
 
         if (!inventory) throw new NotFoundException('Inventory not found for this product');
@@ -69,7 +71,11 @@ export class InventoryService {
     //     }
     // };
 
-    async reserveStock( manager: EntityManager, productId: string, quantity: number) : Promise<Inventory> {
+    async reserveStock(
+        manager: EntityManager,
+        productId: string,
+        quantity: number,
+    ): Promise<Inventory> {
         const inventory = await manager
             .getRepository(Inventory)
             .createQueryBuilder('inventory')
@@ -79,14 +85,14 @@ export class InventoryService {
             })
             .getOne();
 
-        if(!inventory) throw new NotFoundException(`Inventory not found for product: ${productId}`);
+        if (!inventory)
+            throw new NotFoundException(`Inventory not found for product: ${productId}`);
 
         const availableQuantity = inventory.quantity - inventory.reservedQuantity;
-        if(availableQuantity < quantity) throw new BadRequestException(`Insufficient stock for product ${productId}`);
+        if (availableQuantity < quantity)
+            throw new BadRequestException(`Insufficient stock for product ${productId}`);
 
         inventory.reservedQuantity += quantity;
-        return manager
-            .getRepository(Inventory)
-            .save(inventory);
+        return manager.getRepository(Inventory).save(inventory);
     }
 }

@@ -1,18 +1,17 @@
-import { Controller, Get, UseGuards, UseInterceptors } from "@nestjs/common";
-import { UserService } from "./user.service";
-import { SkipThrottle } from "@nestjs/throttler";
-import { CacheInterceptor, CacheKey, CacheTTL } from "@nestjs/cache-manager";
-import { Permissions } from "src/permission/decorator/permission.decorator";
-
+import { Controller, Get, UseInterceptors } from '@nestjs/common';
+import { UserService } from './user.service';
+import { SkipThrottle } from '@nestjs/throttler';
+import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
+import { Permissions } from 'src/permission/decorator/permission.decorator';
 
 @Controller()
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    @SkipThrottle({'short': true, 'medium': true})
+    @SkipThrottle({ short: true, medium: true })
     @UseInterceptors(CacheInterceptor)
     @CacheKey('users')
-    @Permissions("user:view")
+    @Permissions('user:view')
     // @CacheTTL(30 * 1000)
     @Get('/users')
     async getUsers() {

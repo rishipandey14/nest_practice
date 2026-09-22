@@ -1,28 +1,33 @@
-import { Product } from "src/ecomm/products/entity/products.entity";
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-
-
+import { Product } from 'src/ecomm/products/entity/products.entity';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('Category')
 export class Category {
     @PrimaryGeneratedColumn('uuid')
-    id !: string;
+    id!: string;
 
-    @Column({length: 100, unique: true})
-    name !: string;
+    @Column({ length: 100, unique: true })
+    name!: string;
 
-    @Column({type: 'text', nullable: true})
-    description !: string;
+    @Column({ type: 'text', nullable: true })
+    description!: string;
 
-    @Column({default: true})
-    isActive !: boolean;
+    @Column({ default: true })
+    isActive!: boolean;
 
     @CreateDateColumn()
-    created_at !: Date;
+    created_at!: Date;
 
     @UpdateDateColumn()
-    updated_at !: Date;
+    updated_at!: Date;
 
-    @OneToMany(() => Product, (product) => product.category )
-    products !: Product[]
+    @OneToMany(() => Product, (product) => product.category)
+    products!: Product[];
 }

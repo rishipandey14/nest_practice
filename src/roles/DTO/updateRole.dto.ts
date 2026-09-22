@@ -1,19 +1,16 @@
-import { IsArray, IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator";
-
-
+import { IsArray, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class UpdateRoleDTO {
-    
     @IsString()
     @IsOptional()
-    name ?: string;
+    name?: string;
 
     @IsString()
     @IsOptional()
-    description ?: string;
-    
+    description?: string;
+
     @IsArray()
     @IsOptional()
-    @IsInt({each: true})
-    permission_ids ?: number[];
+    @IsInt({ each: true })
+    permission_ids?: number[];
 }

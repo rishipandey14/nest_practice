@@ -1,22 +1,28 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { OrderStatus } from "../enums/orderStatus.enum";
-import { OrderItem } from "./orderItem.entity";
-
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
+import { OrderStatus } from '../enums/orderStatus.enum';
+import { OrderItem } from './orderItem.entity';
 
 @Entity('Order')
 export class Order {
     @PrimaryGeneratedColumn('uuid')
-    id !: string;
+    id!: string;
 
     @Column()
-    userId !: string;
+    userId!: string;
 
     @Column({
         type: 'enum',
         enum: OrderStatus,
-        default: OrderStatus.PENDING
+        default: OrderStatus.PENDING,
     })
-    status !: OrderStatus;
+    status!: OrderStatus;
 
     @Column('decimal', {
         precision: 12,
@@ -24,12 +30,8 @@ export class Order {
     })
     total!: number;
 
-    @OneToMany(
-        () => OrderItem,
-        (item) => item.order,
-        {cascade: true}
-    )
-    items !: OrderItem[];
+    @OneToMany(() => OrderItem, (item) => item.order, { cascade: true })
+    items!: OrderItem[];
 
     @CreateDateColumn()
     createdAt!: Date;

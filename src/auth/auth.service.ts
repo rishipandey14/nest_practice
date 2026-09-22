@@ -1,17 +1,17 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
-import * as bcrypt from "bcrypt";
+import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { MailService } from 'src/mail/mail.service';
-import { ForgotPasswordDTO } from './DTO/ForgotPassword.dto';
-import { RegisterUserDTO } from 'src/auth/DTO/RegisterUser.dto';
+// import { ForgotPasswordDTO } from './DTO/ForgotPassword.dto';
+// import { RegisterUserDTO } from 'src/auth/DTO/RegisterUser.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { PasswordResetToken } from './Schemas/PasswordResetToken.schema';
 import { Model } from 'mongoose';
-import { createHash, randomBytes } from 'crypto';
-import { ResetPasswordDTO } from './DTO/ResetPasswpord.dto';
+// import { createHash, randomBytes } from 'crypto';
+// import { ResetPasswordDTO } from './DTO/ResetPasswpord.dto';
 import { LoginUserDTO } from './DTO/LoginUser.dto';
-import { SYSTEM_ROLE_IDS } from 'src/roles/constants/roles.constant';
+// import { SYSTEM_ROLE_IDS } from 'src/roles/constants/roles.constant';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +21,7 @@ export class AuthService {
         private readonly mailService: MailService,
 
         @InjectModel(PasswordResetToken.name)
-        private readonly passwordResetTokenModel: Model<PasswordResetToken>
+        private readonly passwordResetTokenModel: Model<PasswordResetToken>,
     ) {}
 
     // async RegisterUser(registerUserDto: RegisterUserDTO) {
@@ -37,7 +37,7 @@ export class AuthService {
     //      * return token in response
     //      */
     //     const user = await this.userService.createUser(
-    //         registerUserDto, 
+    //         registerUserDto,
     //         hashedPassword,
     //         SYSTEM_ROLE_IDS.USER,
     //     );
@@ -60,7 +60,6 @@ export class AuthService {
     //     };
     // }
 
-
     // async RegisterSeller(registerUserDto: RegisterUserDTO) {
 
     //     const saltRound = 10;
@@ -74,7 +73,7 @@ export class AuthService {
     //      * return token in response
     //      */
     //     const user = await this.userService.createUser(
-    //         registerUserDto, 
+    //         registerUserDto,
     //         hashedPassword,
     //         SYSTEM_ROLE_IDS.SELLER,
     //     );
@@ -119,7 +118,7 @@ export class AuthService {
     //     const token_hash = createHash('sha256')
     //         .update(raw_token)
     //         .digest('hex')
-        
+
     //     const expires_at = new Date(Date.now() + 15 * 60 * 1000 );  // 15 min
 
     //     // delete previous unused token
@@ -135,7 +134,7 @@ export class AuthService {
     //     });
 
     //     await this.mailService.sendResetPasswordMail(email, raw_token);
-        
+
     //     return {
     //         message: "if an account exists with this email, a reset link has been sent."
     //     }
@@ -158,8 +157,8 @@ export class AuthService {
 
     //     // 3-> Token doesn't exist
     //     if(!reset_token) throw new BadRequestException('Invalid or Expired reset token.');
-        
-    //     // 4-> Token has already been used 
+
+    //     // 4-> Token has already been used
     //     if(reset_token.used_at) throw new BadRequestException('Reset token has already been used.');
 
     //     // 5 -> token has been expired
@@ -188,20 +187,20 @@ export class AuthService {
     async LoginUser(loginUserDto: LoginUserDTO) {
         // console.log(loginUserDto);
         const { email, password } = loginUserDto;
-        
+
         const user = await this.userService.findByEmail(email);
-        if(!user) throw new UnauthorizedException('Invalid email or password');
+        if (!user) throw new UnauthorizedException('Invalid email or password');
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
-        if(!isPasswordValid) throw new UnauthorizedException('Invalid email or password');
-        
+        if (!isPasswordValid) throw new UnauthorizedException('Invalid email or password');
+
         const payload = {
             sub: user.id,
             email: user.email,
-            role_id: user.roleId
-        }
-        console.log("User logged in details; ", user);
+            role_id: user.roleId,
+        };
+        console.log('User logged in details; ', user);
         const token = await this.jwtService.signAsync(payload);
 
         return {

@@ -7,7 +7,7 @@ import { SkipAuth } from 'src/auth/Decorators/skipAuth.decorator';
 @Controller('roles')
 @SkipAuth()
 export class RolesController {
-    constructor( private readonly roleService: RolesService ) {}
+    constructor(private readonly roleService: RolesService) {}
 
     @Post()
     async createRole(@Body() dto: CreateRoleDTO) {
@@ -20,20 +20,17 @@ export class RolesController {
     }
 
     @Get(':id')
-    async getRoleById( @Param('id', ParseIntPipe) id: number ) {
+    async getRoleById(@Param('id', ParseIntPipe) id: number) {
         return this.roleService.getRoleById(id);
     }
 
     @Patch(':id')
-    async updateRole(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateRoleDTO ) {
-        return this.roleService.updateRole(
-            id,
-            dto,
-        );
+    async updateRole(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateRoleDTO) {
+        return this.roleService.updateRole(id, dto);
     }
 
     @Delete(':id')
-    async deleteRole(@Param('id', ParseIntPipe) id: number ) {
+    async deleteRole(@Param('id', ParseIntPipe) id: number) {
         return this.roleService.deleteRole(id);
     }
 }
