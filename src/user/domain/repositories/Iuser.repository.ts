@@ -5,7 +5,7 @@ export interface UserRepository {
 
     findByEmail(email: string): Promise<User | null>;
 
-    getAllUser(): Promise<User[]>;
+    getAllUser(limit: number, offset: number): Promise<User[]>;
 
     // updatePassword( id: string, hashedPassword: string ): Promise<User | null>;
 }

@@ -49,11 +49,12 @@ export class PostgresUserRepository implements UserRepository {
         );
     }
 
-    async getAllUser(): Promise<User[]> {
+    async getAllUser(limit: number, offset: number): Promise<User[]> {
         const result = await this.dataSource.query(
             `
-            SELECT * FROM fn_get_all_users()
+            SELECT * FROM fn_get_all_users($1, $2)
             `,
+            [limit, offset],
         );
         return result;
     }

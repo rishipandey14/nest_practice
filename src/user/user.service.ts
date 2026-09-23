@@ -51,8 +51,8 @@ export class UserService {
     //     );
     // }
 
-    async getAllUser() {
-        return this.userRepository.getAllUser();
+    async getAllUser(limit: number, offset: number) {
+        return this.userRepository.getAllUser(limit, offset);
     }
 
     async findUser(id: string) {
