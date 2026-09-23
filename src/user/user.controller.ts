@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 import { Permissions } from 'src/permission/decorator/permission.decorator';
+// import { SkipAuth } from 'src/auth/Decorators/skipAuth.decorator';
 
 @Controller()
 export class UserController {

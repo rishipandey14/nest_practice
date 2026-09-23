@@ -11,7 +11,7 @@ import { VideoProcessor } from './video.worker';
 import { VideoQueueEventsListener } from './video.queue.events';
 import { MailModule } from './mail/mail.module';
 import { minutes, seconds, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import { CacheModule } from '@nestjs/cache-manager';
 // import { redisStore } from 'cache-manager-redis-yet';
@@ -27,9 +27,14 @@ import { OrdersModule } from './ecomm/orders/orders.module';
 import { DatabaseAccessMiddleware } from './shared/database-access/middleware/databaseAccess.middleware';
 import { DatabaseAccessModule } from './shared/database-access/databaseAccess.module';
 import { UserDbModule } from './userDbMapping/userDbMapping.module';
+import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
+import { LoggerModule } from 'nestjs-pino';
+import { nestLoggerConfig } from './config/nest-logger.config';
 
 @Module({
     imports: [
+        SentryModule.forRoot(),
+        LoggerModule.forRoot(nestLoggerConfig),
         ConfigModule.forRoot({
             isGlobal: true,
         }),
@@ -116,7 +121,7 @@ import { UserDbModule } from './userDbMapping/userDbMapping.module';
             inject: [ConfigService],
             useFactory: async (configService: ConfigService) => {
                 return {
-                    ttl: 1000,
+                    ttl: 60 * 1000,
                     stores: new KeyvRedis(configService.get<string>('REDIS_URL')),
                 };
             },
@@ -135,6 +140,10 @@ import { UserDbModule } from './userDbMapping/userDbMapping.module';
     ],
     controllers: [AppController, VideoController],
     providers: [
+        {
+            provide: APP_FILTER,
+            useClass: SentryGlobalFilter,
+        },
         AppService,
         VideoProcessor,
         VideoQueueEventsListener,
