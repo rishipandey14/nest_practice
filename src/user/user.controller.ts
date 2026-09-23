@@ -12,7 +12,7 @@ export class UserController {
     @SkipThrottle({ short: true, medium: true })
     @UseInterceptors(CacheInterceptor)
     @CacheKey('users')
-    @Permissions('user:view')
+    // @Permissions('user:view')
     // @CacheTTL(30 * 1000)
     @Get('/users')
     async getUsers() {

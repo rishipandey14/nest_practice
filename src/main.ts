@@ -20,6 +20,9 @@ async function bootstrap() {
             transform: true,
         }),
     );
-    await app.listen(process.env.PORT ?? 3000);
+    await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
 }
-void bootstrap();
+bootstrap().catch((error) => {
+    console.error('Application failed to start:', error);
+    process.exit(1);
+});
