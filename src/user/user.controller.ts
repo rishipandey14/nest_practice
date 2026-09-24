@@ -1,4 +1,11 @@
-import { Controller, Get, ParseIntPipe, Query, UseInterceptors } from '@nestjs/common';
+import {
+    Controller,
+    DefaultValuePipe,
+    Get,
+    ParseIntPipe,
+    Query,
+    UseInterceptors,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { UserCacheInterceptor } from 'src/shared/interceptor/user-cache.interceptor';
@@ -15,8 +22,8 @@ export class UserController {
     // @CacheTTL(30 * 1000)
     @Get('/users')
     async getUsers(
-        @Query('limit', ParseIntPipe) limit: number,
-        @Query('offset', ParseIntPipe) offset: number,
+        @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+        @Query('offset', new DefaultValuePipe(0), ParseIntPipe) offset: number,
     ) {
         return this.userService.getAllUser(limit, offset);
     }
